@@ -1,5 +1,5 @@
 import React from 'react';
-import Pokedex from './Pokedex';
+import Pokedex from './pokedex';
 
 const App: React.FC = () => {
   return (
