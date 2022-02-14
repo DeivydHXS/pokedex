@@ -1,8 +1,8 @@
-import { AppBar, Box, Button, Card, CardActions, CardContent, Container, Grid, IconButton, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Card, CardActions, CardContent, CardMedia, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Toolbar, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { getPokemonDetails } from '../pokemon/services/getPokemon';
 import { listPokemons, PokemonItemInterface } from '../pokemon/services/listPokemons';
-import MenuIcon from '@mui/icons-material/Menu';
+import { PokemonDetails } from '../pokemon/interfaces/pokemonDetails';
 
 interface PokedexProps {
     
@@ -11,7 +11,44 @@ interface PokedexProps {
 const Pokedex: React.FC<PokedexProps> = () => {
     const [pokemons, setPokemons] = useState<PokemonItemInterface[]>([]);
     const [selectedPokemon, setSelectedPokemon] = useState<PokemonItemInterface | undefined>(undefined);
-    const [selectedPokemonDetails, setSelectedPokemonDetails] = useState<any | undefined>(undefined);
+    const [selectedPokemonDetails, setSelectedPokemonDetails] = useState<PokemonDetails>({
+        abilities: [],
+        base_experience: 1,
+        forms: [],
+        game_indices: [],
+        height: 1,
+        held_items: [],
+        id: 1,
+        is_default: true,
+        location_area_encounters: '',
+        moves: [],
+        name: '',
+        order: 1,
+        past_types: [],
+        species: { name: 'sad', url: 'asf' },
+        sprites: { 
+            back_default:       'string',
+            back_female:        null,
+            back_shiny:         'string',
+            back_shiny_female:  null,
+            front_default:      'string',
+            front_female:       null,
+            front_shiny:        'string',
+            front_shiny_female: null,
+        },
+        stats: [],
+        types: [],
+        weight: 1
+    });
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     useEffect(() => {
         listPokemons().then((response) => {
@@ -25,6 +62,7 @@ const Pokedex: React.FC<PokedexProps> = () => {
         getPokemonDetails(selectedPokemon.name).then((response) => {
             setSelectedPokemonDetails(response);
         });
+        handleClickOpen();
     }, [selectedPokemon]);
 
     return (
@@ -32,15 +70,6 @@ const Pokedex: React.FC<PokedexProps> = () => {
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
                     <Toolbar>
-                        <IconButton
-                            size="large"
-                            edge="start"
-                            color="inherit"
-                            aria-label="menu"
-                            sx={{ mr: 2 }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             Pokedex
                         </Typography>
@@ -54,6 +83,12 @@ const Pokedex: React.FC<PokedexProps> = () => {
                         {pokemons.map(pokemon => (
                             <Grid item xs={6} lg={3}>
                                 <Card sx={{ minWidth: 275 }}>
+                                <CardMedia
+                                    component="img"
+                                    height="194"
+                                    image={`https://unpkg.com/pokeapi-sprites@2.0.2/sprites/pokemon/other/dream-world/${1}.svg`}
+                                    alt={pokemon.name}
+                                />
                                     <CardContent>
                                         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                         {pokemon.name}
@@ -67,8 +102,19 @@ const Pokedex: React.FC<PokedexProps> = () => {
                         ))}
                     </Grid>
                     
-                    <h3>Pokemon selecionado: {selectedPokemon?.name || 'Nenhum pokemon selecionado.'}</h3>
-                    {JSON.stringify(selectedPokemonDetails, undefined, 2)}
+                    <Dialog open={open} onClose={handleClose} >
+                        <DialogTitle>Pokemon Details</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                {selectedPokemonDetails.name}
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose} autoFocus>
+                                Close
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </Box>
             </Container>
         </div>
