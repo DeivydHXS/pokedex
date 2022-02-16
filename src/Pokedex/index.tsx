@@ -1,14 +1,16 @@
-import { AppBar, Box, Button, Card, CardActions, CardContent, CardMedia, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Container, Toolbar, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { getPokemonDetails } from '../pokemon/services/getPokemon';
 import { listPokemons, PokemonItemInterface } from '../pokemon/services/listPokemons';
 import { PokemonDetails } from '../pokemon/interfaces/pokemonDetails';
+import { PokemonDialog } from '../pokemon/components/PokemonDialog';
+import PokemonGrid from '../pokemon/components/PokemonGrid';
 
 interface PokedexProps {
     
 }
 
-const Pokedex: React.FC<PokedexProps> = () => {
+export const Pokedex: React.FC<PokedexProps> = () => {
     const [pokemons, setPokemons] = useState<PokemonItemInterface[]>([]);
     const [selectedPokemon, setSelectedPokemon] = useState<PokemonItemInterface | undefined>(undefined);
     const [selectedPokemonDetails, setSelectedPokemonDetails] = useState<PokemonDetails>({
@@ -48,6 +50,7 @@ const Pokedex: React.FC<PokedexProps> = () => {
 
     const handleClose = () => {
         setOpen(false);
+        setSelectedPokemon(undefined);
     };
 
     useEffect(() => {
@@ -61,8 +64,8 @@ const Pokedex: React.FC<PokedexProps> = () => {
 
         getPokemonDetails(selectedPokemon.name).then((response) => {
             setSelectedPokemonDetails(response);
+            handleClickOpen();
         });
-        handleClickOpen();
     }, [selectedPokemon]);
 
     return (
@@ -74,51 +77,17 @@ const Pokedex: React.FC<PokedexProps> = () => {
                             Pokedex
                         </Typography>
                     </Toolbar>
-                </AppBar>
+                </AppBar>,
+                
             </Box>
 
             <Container maxWidth='lg'>
                 <Box mt={1}>
-                    <Grid container spacing={2}>
-                        {pokemons.map(pokemon => (
-                            <Grid item xs={6} lg={3}>
-                                <Card sx={{ minWidth: 275 }}>
-                                <CardMedia
-                                    component="img"
-                                    height="194"
-                                    image={`https://unpkg.com/pokeapi-sprites@2.0.2/sprites/pokemon/other/dream-world/${1}.svg`}
-                                    alt={pokemon.name}
-                                />
-                                    <CardContent>
-                                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                        {pokemon.name}
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button size="small" onClick={() => setSelectedPokemon(pokemon)}>Catch it!</Button>
-                                    </CardActions>
-                                </Card>
-                            </Grid>     
-                        ))}
-                    </Grid>
+                    <PokemonGrid pokemons={pokemons} setSelectedPokemon={setSelectedPokemon} />
                     
-                    <Dialog open={open} onClose={handleClose} >
-                        <DialogTitle>Pokemon Details</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>
-                                {selectedPokemonDetails.name}
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleClose} autoFocus>
-                                Close
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                    <PokemonDialog open={open} handleClose={handleClose} selectedPokemonDetails={selectedPokemonDetails} />
                 </Box>
             </Container>
         </div>
     );
 };
-
-export default Pokedex;
