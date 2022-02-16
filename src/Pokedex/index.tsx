@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, Toolbar, Typography } from '@mui/material';
+import { AppBar, Autocomplete, Box, Container, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { getPokemonDetails } from '../pokemon/services/getPokemon';
 import { listPokemons, PokemonItemInterface } from '../pokemon/services/listPokemons';
@@ -76,6 +76,14 @@ export const Pokedex: React.FC<PokedexProps> = () => {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             Pokedex
                         </Typography>
+                        <Stack spacing={2} sx={{ width: 300 }}>
+                            <Autocomplete
+                                id="search-pokemon"
+                                freeSolo
+                                options={pokemons.map((option) => option.name)}
+                                renderInput={(params) => <TextField {...params} label="searchPokemon" />}
+                            />
+                        </Stack>
                     </Toolbar>
                 </AppBar>,
                 
